@@ -1,14 +1,11 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub mod memory;
+pub mod utils;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
+    // use super::*;
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    fn test() {
+        println!("{}", crate::utils::get_system_directory(100))
     }
 }

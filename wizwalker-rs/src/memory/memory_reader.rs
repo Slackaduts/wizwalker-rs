@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Result};
 use pelite::pe::exports::By;
-use pelite::util::FromBytes;
 use tokio::sync::Mutex;
 use winapi::shared::minwindef::LPVOID;
 use winapi::um::handleapi::INVALID_HANDLE_VALUE;
@@ -13,14 +12,13 @@ use winapi::um::memoryapi::{ReadProcessMemory, VirtualAllocEx, VirtualFreeEx, Vi
 use winapi::um::winnt::{HANDLE, MEMORY_BASIC_INFORMATION, MEM_COMMIT, MEM_RELEASE, MEM_RESERVE, PAGE_READWRITE};
 use winapi::um::{handleapi::CloseHandle, tlhelp32::MODULEENTRY32};
 use pelite::pe::{Pe, PeFile};
-use std::fs::File;
-use std::io::Read;
+use std::{fs::File, io::Read, fmt::Debug};
 use region::Protection;
 use winapi::ctypes::c_void;
 use regex::bytes::Regex;
 use winapi::um::processthreadsapi::CreateRemoteThread;
 
-use bytemuck::{bytes_of, from_bytes, NoUninit, Pod, Zeroable};
+use bytemuck::{bytes_of, from_bytes, Pod, Zeroable};
 
 use crate::utils::{check_if_process_running, get_system_directory, module_from_name};
 
@@ -43,10 +41,12 @@ fn addr_from_by(by: By<'_, PeFile<'_>>) -> Result<u32> {
 
 
 // Define a struct for handling memory reading operations
+#[derive(Debug)]
 pub struct MemoryReader {
     process: Arc<Mutex<HANDLE>>,
     symbol_table: HashMap<String, HashMap<String, u32>>, // Simplified symbol table
 }
+
 impl MemoryReader {
     // Constructor for MemoryReader
     pub fn new(process: HANDLE) -> Self {
@@ -392,7 +392,7 @@ impl MemoryReader {
 
     pub async fn read_typed<T>(&mut self, address: usize) -> Result<T>
     where
-        T: Sized + std::fmt::Debug + Copy + Pod + Zeroable,
+        T: Sized + Pod + Zeroable,
     {
         let data_bytes = self.read_bytes(address, std::mem::size_of::<T>()).await?;
 
@@ -404,7 +404,7 @@ impl MemoryReader {
 
     pub async fn write_typed<T>(&mut self, address: usize, value: T) -> Result<()>
     where
-        T: Sized + std::fmt::Debug + Pod + ,
+        T: Sized + Pod + Zeroable,
     {
         let value_bytes = bytes_of(&value);
         self.write_bytes(address, value_bytes.to_vec()).await?;

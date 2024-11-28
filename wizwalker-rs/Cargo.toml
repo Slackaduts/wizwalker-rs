@@ -9,10 +9,14 @@ edition = "2021"
 anyhow = "1.0.93"
 bitflags = "2.6.0"
 bytemuck = "1.19.0"
+byteorder = "1.5.0"
+directories = "5.0.1"
+encoding = "0.2.33"
+flate2 = "1.0.35"
 libc = "0.2.162"
 log = "0.4.22"
 pelite = "0.10.0"
 regex = "1.11.1"
 region = "3.0.2"
-tokio = { version = "1", features = ["full"] }
-winapi = { version = "0.3.9", features = ["memoryapi", "processthreadsapi", "sysinfoapi", "tlhelp32"] }
+serde_json = "1.0.133"
+winapi = { version = "0.3.9", features = ["errhandlingapi", "memoryapi", "processthreadsapi", "sysinfoapi", "tlhelp32", "winreg"] }
